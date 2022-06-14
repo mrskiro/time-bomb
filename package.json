@@ -10,14 +10,19 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:time-bomb.time-bomb"
+    "onCommand:time-bomb.enabled",
+    "onCommand:time-bomb.disabled"
   ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "time-bomb.time-bomb",
-        "title": "time-bomb"
+        "command": "time-bomb.enabled",
+        "title": "Enabled time-bomb"
+      },
+      {
+        "command": "time-bomb.disabled",
+        "title": "Disabled time-bomb"
       }
     ]
   },

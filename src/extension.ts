@@ -4,52 +4,49 @@ import { Timer } from "./modules/timer"
 
 const timer = new Timer(3)
 const meter = new MeterDecoration(timer)
+
+let enabled = false
+
 export function activate(context: vscode.ExtensionContext) {
-  console.log('Congratulations, your extension "time-bomb" is now active!')
+  vscode.commands.registerCommand("time-bomb.enabled", () => {
+    enabled = true
+    vscode.window.showInformationMessage("🔥")
+    const { activeTextEditor } = vscode.window
+    if (!activeTextEditor) return
+    const { visibleRanges } = activeTextEditor
+    const position = visibleRanges.find((v) => !v.isEmpty)
+    if (!position) {
+      meter.remove()
+      return
+    }
+    const range = new vscode.Range(position.start, position.start)
+    meter.update(range, activeTextEditor)
+  })
 
-  context.subscriptions.push(
-    vscode.commands.registerCommand("time-bomb.time-bomb", () => {
-      vscode.window.showInformationMessage("Hello World from time-bomb!")
-    })
-  )
-  context.subscriptions.push(
-    vscode.window.onDidChangeTextEditorVisibleRanges((e) => {
-      const { visibleRanges, textEditor } = e
-      const position = visibleRanges.find((v) => !v.isEmpty)
-      if (!position) {
-        meter.remove()
-        return
-      }
-      const range = new vscode.Range(position.start, position.start)
-      meter.update(range, textEditor)
-    })
-  )
+  vscode.commands.registerCommand("time-bomb.disabled", () => {
+    enabled = false
+    vscode.window.showInformationMessage("💧")
+    meter.remove()
+  })
 
-  // vscode.window.onDidChangeActiveTextEditor(
-  //   (editor) => {
-  //     activeEditor = editor
-  //     if (editor) {
-  //       triggerUpdateDecorations()
-  //     }
-  //   },
-  //   null,
-  //   context.subscriptions
-  // )
-
-  // vscode.window.onDidChangeTextEditorVisibleRanges(
-  //   (event) => {
-  //     if (activeEditor) {
-  //       triggerUpdateDecorations(true)
-  //     }
-  //   },
-  //   null,
-  //   context.subscriptions
-  // )
+  vscode.window.onDidChangeTextEditorVisibleRanges((e) => {
+    if (!enabled) return
+    const { visibleRanges, textEditor } = e
+    const position = visibleRanges.find((v) => !v.isEmpty)
+    if (!position) {
+      meter.remove()
+      return
+    }
+    const range = new vscode.Range(position.start, position.start)
+    meter.update(range, textEditor)
+  })
 
   vscode.workspace.onDidChangeTextDocument((e) => {
+    if (!enabled) return
     timer.restart()
   })
   vscode.workspace.onDidSaveTextDocument((e) => {
+    if (!enabled) return
     timer.restart()
   })
 }
