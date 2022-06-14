@@ -1,28 +1,58 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode"
+import { MeterDecoration } from "./modules/meter"
+import { Timer } from "./modules/timer"
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
+const timer = new Timer(5)
+const meter = new MeterDecoration(timer)
+
 export function activate(context: vscode.ExtensionContext) {
-  // Use the console to output diagnostic information (console.log) and errors (console.error)
-  // This line of code will only be executed once when your extension is activated
   console.log('Congratulations, your extension "time-bomb" is now active!')
 
-  // The command has been defined in the package.json file
-  // Now provide the implementation of the command with registerCommand
-  // The commandId parameter must match the command field in package.json
-  let disposable = vscode.commands.registerCommand(
-    "time-bomb.time-bomb",
-    () => {
-      // The code you place here will be executed every time your command is executed
-      // Display a message box to the user
+  context.subscriptions.push(
+    vscode.commands.registerCommand("time-bomb.time-bomb", () => {
       vscode.window.showInformationMessage("Hello World from time-bomb!")
-    }
+    })
+  )
+  context.subscriptions.push(
+    vscode.window.onDidChangeTextEditorVisibleRanges((e) => {
+      const { visibleRanges } = e
+      const position = visibleRanges.find((v) => !v.isEmpty)
+      if (!position) {
+        meter.remove()
+        return
+      }
+      const range = new vscode.Range(position.start, position.start)
+      meter.update(range)
+    })
   )
 
-  context.subscriptions.push(disposable)
+  // vscode.window.onDidChangeActiveTextEditor(
+  //   (editor) => {
+  //     activeEditor = editor
+  //     if (editor) {
+  //       triggerUpdateDecorations()
+  //     }
+  //   },
+  //   null,
+  //   context.subscriptions
+  // )
+
+  // vscode.window.onDidChangeTextEditorVisibleRanges(
+  //   (event) => {
+  //     if (activeEditor) {
+  //       triggerUpdateDecorations(true)
+  //     }
+  //   },
+  //   null,
+  //   context.subscriptions
+  // )
+
+  vscode.workspace.onDidChangeTextDocument((e) => {
+    timer.restart()
+  })
+  vscode.workspace.onDidSaveTextDocument((e) => {
+    timer.restart()
+  })
 }
 
-// this method is called when your extension is deactivated
 export function deactivate() {}
