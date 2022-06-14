@@ -17,7 +17,7 @@ export class MeterDecoration {
     this.limitTimer.start()
   }
 
-  public update(range: VSCode.Range) {
+  public update(range: VSCode.Range, editor: VSCode.TextEditor) {
     if (!this.canUpdate(range)) return
     if (this.decorationTimer) {
       clearTimeout(this.decorationTimer)
@@ -41,19 +41,14 @@ export class MeterDecoration {
         this.decoration.dispose()
       }
 
-      const width = this.limitTimer.getValue() / new Date().getTime()
-      // console.log(width)
       //TODO
       // animation
       // bomb
       // shake
       this.decoration = VSCode.window.createTextEditorDecorationType({
         before: {
-          // contentText: `${this.limitTimer.getValue()}`,
-          contentText: "",
-          width: `${width}px`,
-          height: "8px",
-          backgroundColor: "white",
+          contentText: `${this.limitTimer.getValue()}💣`,
+          height: "16px",
           color: "white",
           textDecoration: `
           none;
@@ -65,7 +60,7 @@ export class MeterDecoration {
         `,
         },
       })
-      VSCode.window.activeTextEditor?.setDecorations(this.decoration, [range])
+      editor.setDecorations(this.decoration, [range])
     }, this.interval)
   }
 

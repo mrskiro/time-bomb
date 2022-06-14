@@ -2,9 +2,8 @@ import * as vscode from "vscode"
 import { MeterDecoration } from "./modules/meter"
 import { Timer } from "./modules/timer"
 
-const timer = new Timer(5)
+const timer = new Timer(3)
 const meter = new MeterDecoration(timer)
-
 export function activate(context: vscode.ExtensionContext) {
   console.log('Congratulations, your extension "time-bomb" is now active!')
 
@@ -15,14 +14,14 @@ export function activate(context: vscode.ExtensionContext) {
   )
   context.subscriptions.push(
     vscode.window.onDidChangeTextEditorVisibleRanges((e) => {
-      const { visibleRanges } = e
+      const { visibleRanges, textEditor } = e
       const position = visibleRanges.find((v) => !v.isEmpty)
       if (!position) {
         meter.remove()
         return
       }
       const range = new vscode.Range(position.start, position.start)
-      meter.update(range)
+      meter.update(range, textEditor)
     })
   )
 
