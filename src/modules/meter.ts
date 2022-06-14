@@ -6,6 +6,7 @@ export class MeterDecoration {
   private decoration: VSCode.TextEditorDecorationType | null = null
   private decorationTimer: NodeJS.Timer | null = null
   private limitTimer: Timer
+  private bombDecoration: VSCode.TextEditorDecorationType | null = null
 
   private readonly interval = 50
 
@@ -27,23 +28,21 @@ export class MeterDecoration {
 
     this.decorationTimer = setInterval(() => {
       if (this.limitTimer.getValue() <= 0) {
-        editor.setDecorations(
-          VSCode.window.createTextEditorDecorationType({
-            before: {
-              contentText: `💥`,
-              height: "16px",
-              textDecoration: `
-                none;
-                position: absolute;
-                top: 20px;
-                right: 5%;
-                font-size: 48px;
-                text-align: center;
-              `,
-            },
-          }),
-          [range]
-        )
+        this.bombDecoration = VSCode.window.createTextEditorDecorationType({
+          before: {
+            contentText: `💥`,
+            height: "16px",
+            textDecoration: `
+              none;
+              position: absolute;
+              top: 20px;
+              right: 5%;
+              font-size: 48px;
+              text-align: center;
+            `,
+          },
+        })
+        editor.setDecorations(this.bombDecoration, [range])
         setTimeout(() => {
           VSCode.commands.executeCommand("workbench.action.closeWindow")
         }, 1500)
@@ -83,6 +82,10 @@ export class MeterDecoration {
     this.beforeRange = null
     if (this.decoration) {
       this.decoration.dispose()
+      this.decoration = null
+    }
+    if (this.bombDecoration) {
+      this.bombDecoration.dispose()
       this.decoration = null
     }
     if (this.decorationTimer) {
