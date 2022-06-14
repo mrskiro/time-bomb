@@ -26,25 +26,40 @@ export class MeterDecoration {
     this.beforeRange = range
 
     this.decorationTimer = setInterval(() => {
-      // if (this.limitTimer.getValue() <= 0) {
-      //   VSCode.commands.executeCommand("workbench.action.closeWindow")
-      //   if (this.decorationTimer) {
-      //     clearTimeout(this.decorationTimer)
-      //     this.decorationTimer = null
-      //   }
-      //   if (this.decoration) {
-      //     this.decoration.dispose()
-      //     this.decoration = null
-      //   }
-      // }
+      if (this.limitTimer.getValue() <= 0) {
+        editor.setDecorations(
+          VSCode.window.createTextEditorDecorationType({
+            before: {
+              contentText: `💥`,
+              height: "16px",
+              textDecoration: `
+                none;
+                position: absolute;
+                top: 20px;
+                right: 5%;
+                font-size: 48px;
+                text-align: center;
+              `,
+            },
+          }),
+          [range]
+        )
+        setTimeout(() => {
+          VSCode.commands.executeCommand("workbench.action.closeWindow")
+        }, 1500)
+        if (this.decorationTimer) {
+          clearTimeout(this.decorationTimer)
+          this.decorationTimer = null
+        }
+        if (this.decoration) {
+          this.decoration.dispose()
+          this.decoration = null
+        }
+      }
       if (this.decoration) {
         this.decoration.dispose()
       }
 
-      //TODO
-      // animation
-      // bomb
-      // shake
       this.decoration = VSCode.window.createTextEditorDecorationType({
         before: {
           contentText: `${this.limitTimer.getValue()}💣`,
