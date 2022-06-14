@@ -1,9 +1,10 @@
 {
   "name": "time-bomb",
-  "displayName": "time-bomb",
-  "description": "speed!",
-  "version": "0.0.1",
+  "displayName": "Time Bomb",
+  "description": "Increase your coding speed.",
+  "version": "0.0.2",
   "license": "MIT",
+  "publisher": "purpleeeee",
   "repository": {
     "type": "git",
     "url": "https://github.com/purp1eeeee/time-bomb"
